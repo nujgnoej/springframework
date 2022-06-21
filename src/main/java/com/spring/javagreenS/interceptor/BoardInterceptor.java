@@ -12,13 +12,13 @@ public class BoardInterceptor extends HandlerInterceptorAdapter {
   public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
   	HttpSession session = request.getSession();
   	int level = session.getAttribute("sLevel")==null ? 99 : (int) session.getAttribute("sLevel");
-  	if(level > 3) {
+  	if(level > 3) {		// 준회원부터 이곳에 적용을 받는다.
   		RequestDispatcher dispatcher;
   		if(level == 99) {	// 비로그인자 사용불가
-  			dispatcher = request.getRequestDispatcher("/msg/lelvelMemberNo");
+  			dispatcher = request.getRequestDispatcher("/msg/levelMemberNo");
   		}
   		else {	// level이 4(준회원) 사용불가
-  			dispatcher = request.getRequestDispatcher("/msg/lelvelConfirmNo");
+  			dispatcher = request.getRequestDispatcher("/msg/levelConfirmNo");
   		}
   		dispatcher.forward(request, response);
   		return false;

@@ -13,8 +13,10 @@
 	<annotation-driven />
 
 	<!-- Handles HTTP GET requests for /resources/** by efficiently serving up static resources in the ${webappRoot}/resources directory -->
+	<!-- <resources mapping="/resources/**" location="/resources/" /> -->
 	<resources mapping="/images/**" location="/resources/images/" />
 	<resources mapping="/js/**" location="/resources/js/" />
+	<resources mapping="/member/**" location="/resources/member/" />
 
 	<!-- Resolves views selected for rendering by @Controllers to .jsp resources in the /WEB-INF/views directory -->
 	<beans:bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
@@ -24,7 +26,55 @@
 	
 	<context:component-scan base-package="com.spring.javagreenS" />
 	
-	<!-- BCryptPasswordEncoder객체 를 사용하기위한 Bean 등록 -->
-	<beans:bean id="bCryptPasswordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder"/>
+	<!-- BCryptPasswordEncoder객체를 사용하기위한 Bean 등록 -->
+	<beans:bean id="bCryptPasswordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder" />
 	
+	<!-- 파일업로드에 필요한 라이브러리를 Bean으로 등록(용량제한클래스등록) -->
+	<beans:bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<beans:property name="maxUploadSize" value="10485760"/>  <!-- 업로드파일의 최대용량을 10MByte로 제한 -->
+		<beans:property name="defaultEncoding" value="utf-8"/>
+	</beans:bean>
+  
+	<!-- Interceptor 설정하기 -->
+	<beans:bean id="otherInterceptor" class="com.spring.javagreenS.interceptor.OtherInterceptor"/>
+	<beans:bean id="memberInterceptor" class="com.spring.javagreenS.interceptor.MemberInterceptor"/>
+	<beans:bean id="boardInterceptor" class="com.spring.javagreenS.interceptor.BoardInterceptor"/>
+	<beans:bean id="pdsInterceptor" class="com.spring.javagreenS.interceptor.PdsInterceptor"/>
+	<interceptors>
+		<interceptor>
+		  <mapping path="/study/**"/>
+		  <mapping path="/shop/**"/>
+		  <beans:ref bean="otherInterceptor"/>
+		</interceptor>
+	<interceptor>
+		<mapping path="/member/**"/>
+		<exclude-mapping path="/member/memLogin"/>
+		<exclude-mapping path="/member/memLogout"/>
+		<exclude-mapping path="/member/memJoin"/>
+		<exclude-mapping path="/member/memIdCheck"/>
+		<exclude-mapping path="/member/nickNameCheck"/>
+		<exclude-mapping path="/member/memIdPwdSearch"/>
+		<exclude-mapping path="/member/memIdPwdSearchOk"/>
+		<!-- <exclude-mapping path="/member/memList"/> -->
+		<beans:ref bean="memberInterceptor"/>
+	</interceptor>
+	<interceptor>
+		<mapping path="/board/**"/>
+		<mapping path="/member/memList"/>
+		<mapping path="/pds/pdsDownload"/>
+		<mapping path="/pds/pdsInfor"/>
+		<exclude-mapping path="/board/boardList"/>
+		<beans:ref bean="boardInterceptor"/>
+	</interceptor>
+	<interceptor>
+		<mapping path="/pds/**"/>
+		<exclude-mapping path="/pds/pdsList"/>
+		<exclude-mapping path="/pds/pdsDownload"/>
+		<exclude-mapping path="/pds/pdsInfor"/>
+		<beans:ref bean="pdsInterceptor"/>
+	</interceptor>
+	
+	</interceptors>
+  
+  
 </beans:beans>

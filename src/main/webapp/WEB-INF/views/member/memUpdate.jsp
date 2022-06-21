@@ -2,181 +2,204 @@
 <%@ page import="java.util.Date"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%
-  // 취미
-  String hobby_ = (String) request.getAttribute("hobby");
-  String[] hobbys = hobby_.split("/");
-  String[] hobby = {"등산","낚시","수영","독서","영화감상","바둑","축구","기타"};
-%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <c:set var="ctp" value="${pageContext.request.contextPath}"/>
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <title>memUpdate.jsp</title>
-  <jsp:include page="/WEB-INF/views/include/bs4.jsp"/>
-  <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
-  <script src="${ctp}/js/woo.js"></script>
-  <script>
-  	'use strict';
-  	let nickCheckSw = 0;
-  	
-    // 회원가입폼 체크후 서버로 전송하기
-    function fCheck() {
-      let regPwd = /(?=.*[0-9a-zA-Z]).{4,24}/;
-      let regNickName = /^[가-힣]+$/;
-      let regName = /^[가-힣a-zA-Z]+$/;
-      let regEmail =/^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/;
-      let regURL = /^(https?:\/\/)?([a-z\d\.-]+)\.([a-z\.]{2,6})([\/\w\.-]*)*\/?$/;
-      let regTel = /\d{2,3}-\d{3,4}-\d{4}$/g;
-      
-      let submitFlag = 0;		// 전송체크버튼으로 값이 1이면 체크완료되어 전송처리한다.
-    	
-    	let pwd = myForm.pwd.value;
-    	let nickName = myForm.nickName.value;
-    	let name = myForm.name.value;
-    	let email1 = myForm.email1.value;
-    	let email2 = myForm.email2.value;
-      let email = email1 + '@' + email2;
-      let homePage = myForm.homePage.value;
-      let tel1 = myForm.tel1.value;
-      let tel2 = myForm.tel2.value;
-      let tel3 = myForm.tel3.value;
-      let tel = myForm.tel1.value + "-" + myForm.tel2.value + "-" + myForm.tel3.value;
-    	
-    	// 사진 업로드 체크
-    	let fName = myForm.fName.value;
-    	let ext = fName.substring(fName.lastIndexOf(".")+1);	// 파일 확장자 발췌
-    	let uExt = ext.toUpperCase();		// 확장자를 대문자로 변환
-    	let maxSize = 1024 * 1024 * 2; 	// 업로드할 회원사진의 용량은 2MByte까지로 제한한다.
-    	
-    	// 기타 추가로 체크해야 할 항목들을 모두 체크하세요.....
-    	if(!regPwd.test(pwd)) {
-        alert("비밀번호는 4~24 자리로 작성해주세요.");
-        myForm.pwd.focus();
-        return false;
-      }
-      else if(!regNickName.test(nickName)) {
-        alert("닉네임은 한글만 사용가능합니다.");
-        myForm.nickName.focus();
-        return false;
-      }
-      else if(!regName.test(name)) {
-        alert("성명은 한글과 영문대소문자만 사용가능합니다.");
-        myForm.name.focus();
-        return false;
-      }
-      else if(!regEmail.test(email)) {
-        alert("이메일 형식에 맞지않습니다.");
-        myForm.email1.focus();
-        return false;
-      }
-      else if((homePage != "http://" && homePage != "")) {
-        if(!regURL.test(homePage)) {
-	        alert("작성하신 홈페이지 주소가 URL 형식에 맞지않습니다.");
-	        myForm.homePage.focus();
-	        return false;
-        }
-        else {
-	    	  submitFlag = 1;
-	      }
-      }
-    	
-      if(tel2 != "" || tel3 != "") {
-	      if(!regTel.test(tel)) {
-	        alert("전화번호 형식에 맞지않습니다.(000-0000-0000)");
-	        myForm.tel2.focus();
-	        return false;
-	      }
-	      else {
-	    	  submitFlag = 1;
-	      }
-      }
-    	
-  		// 전송전에 '주소'를 하나로 묶어서 전송처리 준비한다.
-  		let postcode = myForm.postcode.value + " ";
-  		let roadAddress = myForm.roadAddress.value + " ";
-  		let detailAddress = myForm.detailAddress.value + " ";
-  		let extraAddress = myForm.extraAddress.value + " ";
-  		myForm.address.value = postcode + "/" + roadAddress + "/" + detailAddress + "/" + extraAddress + "/";
-  		
-  		// 전송전에 파일에 관한 사항체크...
-  		if(fName.trim() == "") {
-  			myForm.photo.value = "noimage"
+	<meta charset="UTF-8">
+	<title>memUpdate.jsp</title>
+	<jsp:include page="/WEB-INF/views/include/bs4.jsp"/>
+	<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+	<script src="${ctp}/js/woo.js"></script>
+	<script>
+		'use strict';
+		let nickCheckSw = 0;
+		
+		// 회원가입폼 체크후 서버로 전송하기
+		function fCheck() {
+			let regPwd = /(?=.*[0-9a-zA-Z]).{4,24}/;
+			let regNickName = /^[가-힣]+$/;
+			let regName = /^[가-힣a-zA-Z]+$/;
+			let regEmail =/^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/;
+			let regURL = /^(https?:\/\/)?([a-z\d\.-]+)\.([a-z\.]{2,6})([\/\w\.-]*)*\/?$/;
+			let regTel = /\d{2,3}-\d{3,4}-\d{4}$/g;
+			
+			let submitFlag = 0;		// 전송체크버튼으로 값이 1이면 체크완료되어 전송처리한다.
+			
+			let pwd = myForm.pwd.value;
+			let nickName = myForm.nickName.value;
+			let name = myForm.name.value;
+			let email1 = myForm.email1.value;
+			let email2 = myForm.email2.value;
+			let email = email1 + '@' + email2;
+			let homePage = myForm.homePage.value;
+			let tel1 = myForm.tel1.value;
+			let tel2 = myForm.tel2.value;
+			let tel3 = myForm.tel3.value;
+			let tel = myForm.tel1.value + "-" + myForm.tel2.value + "-" + myForm.tel3.value;
+			
+			// 사진 업로드 체크
+			let fName = myForm.fName.value;
+			let ext = fName.substring(fName.lastIndexOf(".")+1);	// 파일 확장자 발췌
+			let uExt = ext.toUpperCase();		// 확장자를 대문자로 변환
+			let maxSize = 1024 * 1024 * 2; 	// 업로드할 회원사진의 용량은 2MByte까지로 제한한다.
+			
+			// 기타 추가로 체크해야 할 항목들을 모두 체크하세요.....
+			if(!regPwd.test(pwd)) {
+		    alert("비밀번호는 4~24 자리로 작성해주세요.");
+		    myForm.pwd.focus();
+		    return false;
+			}
+			else if(!regNickName.test(nickName)) {
+				alert("닉네임은 한글만 사용가능합니다.");
+				myForm.nickName.focus();
+				return false;
+			}
+			else if(!regName.test(name)) {
+				alert("성명은 한글과 영문대소문자만 사용가능합니다.");
+				myForm.name.focus();
+				return false;
+			}
+			else if(!regEmail.test(email)) {
+				alert("이메일 형식에 맞지않습니다.");
+				myForm.email1.focus();
+				return false;
+			}
+			else if((homePage != "http://" && homePage != "")) {
+				if(!regURL.test(homePage)) {
+				    alert("작성하신 홈페이지 주소가 URL 형식에 맞지않습니다.");
+				    myForm.homePage.focus();
+				    return false;
+				}
+				else {
+					submitFlag = 1;
+				}
+			}
+			
+			if(tel2 != "" || tel3 != "") {
+				if(!regTel.test(tel)) {
+					alert("전화번호 형식에 맞지않습니다.(000-0000-0000)");
+					myForm.tel2.focus();
+					return false;
+				}
+				else {
+					submitFlag = 1;
+				}
+			}
+			
+			// 전송전에 '주소'를 하나로 묶어서 전송처리 준비한다.
+			/* 
+			let postcode = myForm.postcode.value + " ";
+			let roadAddress = myForm.roadAddress.value + " ";
+			let detailAddress = myForm.detailAddress.value + " ";
+			let extraAddress = myForm.extraAddress.value + " ";
+			myForm.address.value = postcode + "/" + roadAddress + "/" + detailAddress + "/" + extraAddress + "/";
+			 */
+			let postcode = myForm.postcode.value;
+			let roadAddress = myForm.roadAddress.value;
+			let detailAddress = myForm.detailAddress.value;
+			let extraAddress = myForm.extraAddress.value;
+			myForm.address.value = postcode + "/" + roadAddress + "/" + detailAddress + "/" + extraAddress + "/";
+			
+			// 전송전에 파일에 관한 사항체크...
+			/* 
+			if(fName.trim() == "") {
+				myForm.photo.value = "${vo.photo}"
+					submitFlag = 1;
+			}
+			else {
+			 */
+			if(fName.trim() != "") {
+				let fileSize = document.getElementById("file").files[0].size;
+				
+				if(uExt != "JPG" && uExt != "GIF" && uExt != "PNG") {
+					alert("업로드 가능한 파일은 'JPG/GIF/PNG'파일 입니다.");
+					return false;
+				}
+				else if(fName.indexOf(" ") != -1) {
+					alert("업로드 파일명에 공백을 포함할 수 없습니다.");
+					return false;
+				}
+				else if(fileSize > maxSize) {
+					alert("업로드 파일의 크기는 2MByte를 초과할수 없습니다.");
+					return false;
+				}
 				submitFlag = 1;
-  		}
-  		else {
-  			let fileSize = document.getElementById("file").files[0].size;
-  			
-  			if(uExt != "JPG" && uExt != "GIF" && uExt != "PNG") {
-  				alert("업로드 가능한 파일은 'JPG/GIF/PNG'파일 입니다.");
-  				return false;
-  			}
-  			else if(fName.indexOf(" ") != -1) {
-  				alert("업로드 파일명에 공백을 포함할 수 없습니다.");
-  				return false;
-  			}
-  			else if(fileSize > maxSize) {
-  				alert("업로드 파일의 크기는 2MByte를 초과할수 없습니다.");
-  				return false;
-  			}
-    		submitFlag = 1;
-    	}
-    	
-  		// 전송전에 모든 체크가 끝나서 submitFlag가 1이되면 서버로 전송한다.
-  		let nickName_ = '${sNickName}';
-    	if(submitFlag == 1) {
-    		if(nickName_ != nickName && nickCheckSw == 0) {
-    			alert("닉네임 중복체크버튼을 눌러주세요!");
-    		}
-    		else {
-	  			// 묶여진 필드(email/tel)를 폼태그안에 hidden태그의 값으로 저장시켜준다.
-	  			myForm.email.value = email;
-	  			myForm.tel.value = tel;
-	  			
-	  			myForm.submit();
-    		}
-    	}
-    	else {
-    		alert("회원가입 실패~~");
-    	}
-    }
-    
-    // nickName 중복체크
-    function nickCheck() {
-    	let nickName = myForm.nickName.value;
-    	let url = "${ctp}/memNickCheck.mem?nickName="+nickName;
-    	
-    	if(nickName == "") {
-    		alert("닉네임을 입력하세요!");
-    		myForm.nickName.focus();
-    	}
-    	else {
-    		nickCheckSw = 1;
-    		window.open(url,"nWin","width=580px,height=250px");
-    	}
-    }
-  </script>
+			}
+			
+			// 전송전에 모든 체크가 끝나서 submitFlag가 1이되면 서버로 전송한다.
+			let nickName_ = '${sNickName}';
+			if(submitFlag == 1) {
+				if(nickName_ != nickName && nickCheckSw == 0) {
+					alert("닉네임 중복체크버튼을 눌러주세요!");
+				}
+				else {
+		  			// 묶여진 필드(email/tel)를 폼태그안에 hidden태그의 값으로 저장시켜준다.
+		  			myForm.email.value = email;
+		  			myForm.tel.value = tel;
+		  			
+		  			myForm.submit();
+				}
+			}
+			else {
+				alert("회원가입 실패~~");
+			}
+		}
+		
+		// nickName 중복체크
+		function nickCheck() {
+			let nickName = $("#nickName").val();
+			if(nickName == "" || $("#nickName").val().length<2 || $("#nickName").val().length>=20) {
+				alert("닉네임을 입력하세요(아이디는 2~20자 이내로 사용하세요)!");
+				myForm.nickName.focus();
+				return false;
+			}
+			if(nickName == '${sNickName}') {
+				nickCheckSw = 1;
+				return false;
+			}
+			
+			$.ajax({
+				type : "post",
+				url  : "${ctp}/member/nickNameCheck",
+				data : {nickName : nickName},
+				success:function(res) {
+					if(res == "1") {
+						alert("이미 사용중인 닉네임 입니다.");
+						$("#nickName").focus();
+					}
+					else {
+						alert("사용 가능한 닉네임 입니다.");
+						nickCheckSw = 1;	// 닉네임 검색버튼을 클릭한 경우는 nickCheckSw는 1이다.
+					}
+				},
+				error : function() {
+					alert("전송오류!");
+				}
+			});
+		}
+	</script>
 </head>
 <body>
 <jsp:include page="/WEB-INF/views/include/nav.jsp"/>
 <jsp:include page="/WEB-INF/views/include/slide2.jsp"/>
 <div class="container" style="padding:30px">
-  <%-- <form name="myForm" method="post" action="${ctp}/memJoinOk.mem" class="was-validated" enctype="Multipart/form-data"> --%>
-  <form name="myForm" method="post" action="${ctp}/memUpdateOk.mem" class="was-validated">
+  <form name="myForm" method="post" action="${ctp}/member/memUpdateOk" class="was-validated" enctype="Multipart/form-data">
     <h2>회 원 정 보 수 정</h2>
-    <div><font color="blue">(회원정보를 수정하려면 회원비밀번호를 정확히 입력하셔야 합니다.)</font></div>
+    <div><font color="blue"></font></div>
     <br/>
     <div class="form-group">
       아이디 : ${sMid}
     </div>
     <div class="form-group">
       <label for="pwd">비밀번호 :</label>
-      <input type="password" class="form-control" id="pwd" name="pwd" required autofocus />
+      <input type="password" class="form-control" id="pwd" name="pwd" value="${sPwd}" required autofocus />
     </div>
     <div class="form-group">
       <label for="nickName">닉네임 : &nbsp; &nbsp;<input type="button" value="닉네임 중복체크" class="btn btn-secondary btn-sm" onclick="nickCheck()"/></label>
-      <input type="text" class="form-control" id="nickName" value="${sNickName}" name="nickName" required />
+      <input type="text" class="form-control" id="nickName" value="${vo.nickName}" name="nickName" required />
     </div>
     <div class="form-group">
       <label for="name">성명 :</label>
@@ -185,6 +208,9 @@
     <div class="form-group">
       <label for="email1">Email address:</label>
 				<div class="input-group mb-3">
+				  <c:set var="emails" value="${fn:split(vo.email,'@')}"/>
+				  <c:set var="email1" value="${emails[0]}"/>
+				  <c:set var="email2" value="${emails[1]}"/>
 				  <input type="text" class="form-control" value="${email1}" id="email1" name="email1" required />
 				  <div class="input-group-append">
 				    <select name="email2" class="custom-select">
@@ -213,14 +239,16 @@
     </div>
     <div class="form-group">
       <label for="birthday">생일</label>
-      <%-- <c:set var="now" value="<%=new java.util.Date() %>"/>
-      <fmt:formatDate value="${now}" pattern="yyyy-MM-dd"/> --%>
-			<input type="date" name="birthday" value="${birthday}" class="form-control"/>
+			<input type="date" name="birthday" value="${fn:substring(vo.birthday,0,10)}" class="form-control"/>
     </div>
     <div class="form-group">
       <div class="input-group mb-3">
 	      <div class="input-group-prepend">
 	        <span class="input-group-text">전화번호 :</span> &nbsp;&nbsp;
+	          <c:set var="tel" value="${fn:split(vo.tel,'-')}"/>
+					  <c:set var="tel1" value="${tel[0]}"/>
+					  <c:set var="tel2" value="${tel[1]}"/>
+					  <c:set var="tel3" value="${tel[2]}"/>
 			      <select name="tel1" class="custom-select">
 					    <option value="010"	${tel1=="010" ? selected : ""}>010</option>
 					    <option value="02"	${tel1=="02"  ? selected : ""}>서울</option>
@@ -242,6 +270,11 @@
     <div class="form-group">
       <label for="address">주소</label>
 			<input type="hidden" name="address" id="address">
+			<c:set var="address" value="${fn:split(vo.address,'/')}"/>
+		  <c:set var="postcode" value="${address[0]}"/>
+		  <c:set var="roadAddress" value="${address[1]}"/>
+		  <c:set var="detailAddress" value="${address[2]}"/>
+		  <c:set var="extraAddress" value="${address[3]}"/>
 			<div class="input-group mb-1">
 				<input type="text" name="postcode" id="sample6_postcode" value="${postcode}" placeholder="우편번호" class="form-control">
 				<div class="input-group-append">
@@ -275,15 +308,49 @@
       </select>
     </div>
     <div class="form-group">
-			취미 :
-<%    for(int i=0; i<hobby.length; i++) { %>
-				<input type="checkbox" name="hobby" value="<%=hobby[i]%>" 
-<%      if(hobby_.contains(hobby[i])) { %>
-						checked
-<%     	} %>
-				/><%=hobby[i] %>
-<%    } %>
-    </div>
+	    <c:set var="strHobby" value="${vo.hobby}"></c:set>
+	      <div class="form-check-inline">
+	        <span class="input-group-text">취미</span> &nbsp; &nbsp;
+			  <label class="form-check-label">
+			    <input type="checkbox" class="form-check-input" value="등산" name="hobby" <c:if test="${fn:contains(strHobby, '등산')}">checked</c:if>/>등산
+			  </label>
+		  </div>
+			<div class="form-check-inline">
+			  <label class="form-check-label">
+			    <input type="checkbox" class="form-check-input" value="낚시" name="hobby" <c:if test="${fn:contains(strHobby, '낚시')}">checked</c:if>/>낚시
+			  </label>
+			</div>
+			<div class="form-check-inline">
+			  <label class="form-check-label">
+			    <input type="checkbox" class="form-check-input" value="수영" name="hobby" <c:if test="${fn:contains(strHobby, '수영')}">checked</c:if>/>수영
+			  </label>
+			</div>
+			<div class="form-check-inline">
+			  <label class="form-check-label">
+			    <input type="checkbox" class="form-check-input" value="독서" name="hobby" <c:if test="${fn:contains(strHobby, '독서')}">checked</c:if>/>독서
+			  </label>
+			</div>
+			<div class="form-check-inline">
+			  <label class="form-check-label">
+			    <input type="checkbox" class="form-check-input" value="영화감상" name="hobby" <c:if test="${fn:contains(strHobby, '영화감상')}">checked</c:if>/>영화감상
+			  </label>
+			</div>
+			<div class="form-check-inline">
+			  <label class="form-check-label">
+			    <input type="checkbox" class="form-check-input" value="바둑" name="hobby" <c:if test="${fn:contains(strHobby, '바둑')}">checked</c:if>/>바둑
+			  </label>
+			</div>
+			<div class="form-check-inline">
+			  <label class="form-check-label">
+			    <input type="checkbox" class="form-check-input" value="축구" name="hobby" <c:if test="${fn:contains(strHobby, '축구')}">checked</c:if>/>축구
+			  </label>
+			</div>
+			<div class="form-check-inline">
+			  <label class="form-check-label">
+			    <input type="checkbox" class="form-check-input" value="기타" name="hobby" <c:if test="${fn:contains(strHobby, '기타')}">checked</c:if>/>기타
+			  </label>
+			</div>
+		</div>
     <div class="form-group">
       <label for="content">자기소개</label>
       <textarea rows="5" class="form-control" id="content" name="content">${vo.content}</textarea>
@@ -302,15 +369,16 @@
 			</div>
     </div>
     <div  class="form-group">
-      회원 사진(파일용량:2MByte이내) : <img src="${ctp}/data/member/${vo.photo}" width="80px"/>
+      회원 사진(파일용량:2MByte이내) : <img src="${ctp}/member/${vo.photo}" width="80px"/>
       <input type="file" name="fName" id="file" class="form-control-file border"/>
     </div>
     <button type="button" class="btn btn-secondary" onclick="fCheck()">회원정보수정</button> &nbsp;
     <button type="reset" class="btn btn-secondary">다시작성</button> &nbsp;
-    <button type="button" class="btn btn-secondary" onclick="location.href='${ctp}/memMain.mem';">돌아가기</button>
-    <input type="hidden" name="photo"/>
+    <button type="button" class="btn btn-secondary" onclick="location.href='memMain';">돌아가기</button>
+    <input type="hidden" name="photo" value="${vo.photo}"/>
     <input type="hidden" name="email"/>
     <input type="hidden" name="tel"/>
+    <input type="hidden" name="mid" value="${sMid}"/>
   </form>
   <p><br/></p>
 </div>

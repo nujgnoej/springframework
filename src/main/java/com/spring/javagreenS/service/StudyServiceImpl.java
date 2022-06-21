@@ -1,16 +1,24 @@
 package com.spring.javagreenS.service;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.UUID;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.spring.javagreenS.dao.StudyDAO;
 import com.spring.javagreenS.vo.OperatorVO;
 
 @Service
 public class StudyServiceImpl implements StudyService {
-	
+
 	@Autowired
 	StudyDAO studyDAO;
 
@@ -21,13 +29,13 @@ public class StudyServiceImpl implements StudyService {
 
 	@Override
 	public void setOperatorInputOk(OperatorVO vo) {
-		// 1_50까지의 난수를 구해서 해당 난수의 hashKey값을 OperatorHashTable2에서 가져와서 연산시켜준다.
+		// 1~50까지의 난수를 구해서 해당 난수의 hashKey값을 operatorHashTable2에서 가져와서 연산시켜준다.
 		int keyIdx = (int) (Math.random()*50) + 1;
 		
 		// 비밀번호 암호화 시켜주는 메소드를 호출해서 처리한다.
 		String strPwd = setPasswordEncoding(vo.getPwd(), keyIdx);
 		
-		vo.setPwd(strPwd);		// operatorHashTable2테이블의 2가지 속성을 vo에 추가로 저장시킨다.
+		vo.setPwd(strPwd);
 		vo.setKeyIdx(keyIdx);
 		
 		studyDAO.setOperatorInputOk(vo);	// 잘 정리된 vo를 DB에 저장한다.
@@ -37,26 +45,25 @@ public class StudyServiceImpl implements StudyService {
 	private String setPasswordEncoding(String pwd, int keyIdx) {
 		String hashKey = studyDAO.getOperatorHashKey(keyIdx);
 		
-		// 입력된 비밀번호를 아스키코드로 변환하여 누적처리
+	  // 입력된 비밀번호를 아스키코드로 변환하여 누적처리
 		long intPwd;
 		String strPwd = "";
-		// 입력문자가 영문 소문자일경우는 대문자로 변경처리(연산시에 자리수 Over 때문에...)
 		pwd = pwd.toUpperCase();
 		
 		for(int i=0; i<pwd.length(); i++) {
 			intPwd = (long) pwd.charAt(i);
-			strPwd += intPwd;		// 정수형타입에 누적을하면 입력값이 변하기때문에 문자형타입으로 누적
+			strPwd += intPwd;
 		}
 		// 문자로 결합된 숫자를, 연산하기위해 다시 숫자로 변환한다.
 		intPwd = Long.parseLong(strPwd);
 		
 		// 암호화를 위한 키 : hashKey
-		long key = Integer.parseInt(hashKey, 16);	// (hashKey, 16)에서 16은 16진수로 변경한다는 뜻
+		long key = Integer.parseInt(hashKey, 16);
 		long encPwd;
 		
 		// 암호화를 위한 XOR 연산하기
 		encPwd = intPwd ^ key;
-		strPwd = String.valueOf(encPwd);	// 암호화된 자료를 문자로 변환한다.
+		strPwd = String.valueOf(encPwd);  // 암호화된 자료를 문자로 변환한다.
 		
 		return strPwd;
 	}
@@ -123,7 +130,7 @@ public class StudyServiceImpl implements StudyService {
 			strArr[3] = "진천군";
 			strArr[4] = "괴산군";
 			strArr[5] = "음성군";
-			strArr[6] = "단양군";
+			strArr[6] = "단양시";
 			strArr[7] = "영동군";
 			strArr[8] = "보은군";
 			strArr[9] = "증평군";
@@ -140,7 +147,6 @@ public class StudyServiceImpl implements StudyService {
 			strArr[8] = "금산군";
 			strArr[9] = "청양군";
 		}
-		
 		return strArr;
 	}
 
@@ -179,7 +185,7 @@ public class StudyServiceImpl implements StudyService {
 			vos.add("진천군");
 			vos.add("괴산군");
 			vos.add("음성군");
-			vos.add("단양군");
+			vos.add("단양시");
 			vos.add("영동군");
 			vos.add("보은군");
 			vos.add("증평군");
@@ -203,4 +209,32 @@ public class StudyServiceImpl implements StudyService {
 	public ArrayList<OperatorVO> getOperatorVos(String oid) {
 		return studyDAO.getOperatorVos(oid);
 	}
+
+	@Override
+	public int fileUpload(MultipartFile fName) {
+		int res = 0;
+		try {
+			UUID uid = UUID.randomUUID();
+			String oFileName = fName.getOriginalFilename();
+			String saveFileName = uid + "_" + oFileName;
+			
+			writeFile(fName, saveFileName);
+			res = 1;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return res;
+	}
+
+	private void writeFile(MultipartFile fName, String saveFileName) throws IOException {
+		byte[] data = fName.getBytes();
+		
+		HttpServletRequest request = ((ServletRequestAttributes)RequestContextHolder.currentRequestAttributes()).getRequest();
+		String uploadPath = request.getSession().getServletContext().getRealPath("/resources/images/test/");
+		
+		FileOutputStream fos = new FileOutputStream(uploadPath + saveFileName);
+		fos.write(data);
+		fos.close();
+	}
+
 }

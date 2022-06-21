@@ -2,6 +2,8 @@ package com.spring.javagreenS.service;
 
 import java.util.ArrayList;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import com.spring.javagreenS.vo.OperatorVO;
 
 public interface StudyService {
@@ -21,5 +23,7 @@ public interface StudyService {
 	public ArrayList<String> getCityArrayListStr(String dodo);
 
 	public ArrayList<OperatorVO> getOperatorVos(String oid);
+
+	public int fileUpload(MultipartFile fName);
 
 }

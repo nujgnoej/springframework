@@ -23,7 +23,7 @@ public class GuestController {
 	@RequestMapping(value = "/guestList", method = RequestMethod.GET)
 	public String gusetListGet(Model model,
 			@RequestParam(name="pag", defaultValue = "1", required = false) int pag) {
-		// 페이징처리를 위한 준비...
+	  // 페이징처리를 위한 준비...
 		int pageSize = 3;
 		int totRecCnt = guestService.totRecCnt();
 		int totPage = (totRecCnt%pageSize)==0 ? totRecCnt/pageSize : (totRecCnt/pageSize)+1;

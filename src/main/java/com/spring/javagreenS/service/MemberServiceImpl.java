@@ -1,12 +1,18 @@
 package com.spring.javagreenS.service;
 
+import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.UUID;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.spring.javagreenS.common.ProjectSupport;
@@ -78,5 +84,56 @@ public class MemberServiceImpl implements MemberService {
 		}
 		
 		memberDAO.setMemberVisitProcess(vo.getMid(), todayCnt, newPoint);
+	}
+
+	@Override
+	public ArrayList<MemberVO> getMemList() {
+		return memberDAO.getMemList();
+	}
+
+	@Override
+	public int setMemUpdateOk(MultipartFile fName, MemberVO vo) {
+		int res = 0;
+		try {
+			String oFileName = fName.getOriginalFilename();
+			if(!oFileName.equals("")) {
+				UUID uid = UUID.randomUUID();
+				String saveFileName = uid + "_" + oFileName;
+				ProjectSupport ps = new ProjectSupport();
+				ps.writeFile(fName, saveFileName,"member");
+				
+				// 기존에 존재하는 파일 삭제하기
+				if(!vo.getPhoto().equals("noimage.jpg")) {
+					HttpServletRequest request = ((ServletRequestAttributes)RequestContextHolder.currentRequestAttributes()).getRequest();
+					String uploadPath = "";
+					uploadPath = request.getSession().getServletContext().getRealPath("/resources/member/");
+					File file = new File(uploadPath + vo.getPhoto());
+					file.delete();
+				}
+				
+				// 기존파일을 지우고, 새로 업로드된 파일명을 set시킨다.
+				vo.setPhoto(saveFileName);
+			}
+			memberDAO.setMemUpdateOk(vo);
+			res = 1;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return res;
+	}
+
+	@Override
+	public void setMemDeleteOk(String mid) {
+		memberDAO.setMemDeleteOk(mid);
+	}
+
+	@Override
+	public void setPwdChange(String mid, String encode) {
+		memberDAO.setPwdChange(mid, encode);
+	}
+
+	@Override
+	public MemberVO getMemIdEmailCheck(String mid, String toMail) {
+		return memberDAO.getMemIdEmailCheck(mid, toMail);
 	}
 }

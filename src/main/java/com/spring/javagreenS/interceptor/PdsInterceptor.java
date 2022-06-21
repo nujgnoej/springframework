@@ -15,10 +15,10 @@ public class PdsInterceptor extends HandlerInterceptorAdapter {
   	if(level > 2) {
   		RequestDispatcher dispatcher;
   		if(level == 99) {	// 비로그인자 사용불가
-  			dispatcher = request.getRequestDispatcher("/msg/lelvelMemberNo");
+  			dispatcher = request.getRequestDispatcher("/msg/levelMemberNo");
   		}
   		else {	// level이 4(준회원)/3(정회원) 사용불가
-  			dispatcher = request.getRequestDispatcher("/msg/lelvelConfirmNo");
+  			dispatcher = request.getRequestDispatcher("/msg/levelConfirmNo");
   		}
   		dispatcher.forward(request, response);
   		return false;

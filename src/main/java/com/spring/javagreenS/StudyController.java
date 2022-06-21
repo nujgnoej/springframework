@@ -4,6 +4,7 @@ import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.UUID;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
@@ -18,6 +19,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.spring.javagreenS.common.ARIAUtil;
 import com.spring.javagreenS.service.StudyService;
@@ -48,9 +50,9 @@ public class StudyController {
 		long key = 0x1234ABCD;
 		long encPwd, decPwd;
 		
-		encPwd = pwd ^ key;		// 암호화 : DB에 저장시켜준다.
+		encPwd = pwd ^ key;    // 암호화 : DB에 저장시켜준다.
 		
-		decPwd = encPwd ^ key;	// 복호화
+		decPwd = encPwd ^ key;    // 복호화
 		
 		model.addAttribute("pwd", pwd);
 		model.addAttribute("encPwd", encPwd);
@@ -69,7 +71,7 @@ public class StudyController {
 		String strPwd = "";
 		for(int i=0; i<pwd.length(); i++) {
 			intPwd = (long) pwd.charAt(i);
-			strPwd += intPwd;		// 정수형타입에 누적을하면 입력값이 변하기때문에 문자형타입으로 누적
+			strPwd += intPwd;
 		}
 		// 문자로 결합된 숫자를, 연산하기위해 다시 숫자로 변환한다.
 		intPwd = Long.parseLong(strPwd);
@@ -80,8 +82,8 @@ public class StudyController {
 		
 		// 암호화를 위한 EOR 연산하기
 		encPwd = intPwd ^ key;
-		strPwd = String.valueOf(encPwd);	// 암호화 : DB에 저장시켜준다.
-		model.addAttribute("encPwd", strPwd);	// 암호화된 문자
+		strPwd = String.valueOf(encPwd);  // 암호화 : DB에 저장시켜준다.
+		model.addAttribute("encPwd", strPwd);	// 암호화된 문자...
 		
 		// 복호화 작업처리
 		intPwd = Long.parseLong(strPwd);
@@ -96,7 +98,7 @@ public class StudyController {
 			ch = (char) Integer.parseInt(strPwd.substring(i, i+2));
 			result += ch;
 		}
-		model.addAttribute("decPwd", result);	// 복호화된 문자
+		model.addAttribute("decPwd", result);
 		
 		model.addAttribute("pwd", pwd);
 		
@@ -129,14 +131,14 @@ public class StudyController {
 		return "study/password2/operatorList";
 	}
 	
-	@ResponseBody	// jQuery 사용 시 ResponseBody어노테이션 사용해야 함
+	@ResponseBody
 	@RequestMapping(value = "/password2/operatorDelete", method = RequestMethod.POST)
 	public String operatorDeletePost(String oid) {
 		studyService.setOperatorDelete(oid);
 		return "1";
 	}
 	
-	@ResponseBody	// jQuery 사용 시 ResponseBody어노테이션 사용해야 함
+	@ResponseBody
 	@RequestMapping(value = "/password2/operatorSearch", method = RequestMethod.POST)
 	public String operatorSearchPost(OperatorVO vo) {
 		String res = studyService.setOperatorSearch(vo);
@@ -175,6 +177,7 @@ public class StudyController {
 		return studyService.getCityArrayListStr(dodo);
 	}
 	
+	
 	@RequestMapping(value = "/ajax/ajaxTest3", method = RequestMethod.GET)
 	public String ajaxTest3Get() {
 		return "study/ajax/ajaxTest3";
@@ -209,17 +212,20 @@ public class StudyController {
 	@ResponseBody
 	@RequestMapping(value = "/ajax/ajaxTest5", method = RequestMethod.POST)
 	public ArrayList<OperatorVO> ajaxTest5Post(String oid) {
+//		ArrayList<OperatorVO> vos = new ArrayList<OperatorVO>();
+//		vos = studyService.getOperatorVos(oid);
+//		return vos;z
 		return studyService.getOperatorVos(oid);
 	}
 	
 	// aria 암호화 방식연습
-	@RequestMapping(value = "password3/aria", method = RequestMethod.GET)
+	@RequestMapping(value = "/password3/aria", method = RequestMethod.GET)
 	public String ariaGet() {
 		return "study/password3/aria";
 	}
 	
 	@ResponseBody
-	@RequestMapping(value = "password3/aria", method = RequestMethod.POST)
+	@RequestMapping(value = "/password3/aria", method = RequestMethod.POST)
 	public String ariaPost(String pwd) {
 		String encPwd = "";
 		String decPwd = "";
@@ -232,19 +238,20 @@ public class StudyController {
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
-		pwd = "암호화 : " + encPwd + " / Decoding : " + decPwd;
+		pwd = "Encoding : " + encPwd + " / Decoding : " + decPwd;
 		
 		return pwd;
 	}
+  
 	
-	// BCryptPasswordEncoder 암호화 방식연습
-	@RequestMapping(value = "password3/securityCheck", method = RequestMethod.GET)
+  // BCryptPasswordEncoder 암호화 방식연습
+	@RequestMapping(value = "/password3/securityCheck", method = RequestMethod.GET)
 	public String securityCheckGet() {
 		return "study/password3/security";
 	}
 	
 	@ResponseBody
-	@RequestMapping(value = "password3/securityCheck", method = RequestMethod.POST)
+	@RequestMapping(value = "/password3/securityCheck", method = RequestMethod.POST)
 	public String securityCheckPost(String pwd) {
 		String encPwd = "";
 		
@@ -256,13 +263,13 @@ public class StudyController {
 	}
 	
 	// 메일폼 호출
-	@RequestMapping(value = "mail/mailForm", method = RequestMethod.GET)
+	@RequestMapping(value = "/mail/mailForm", method = RequestMethod.GET)
 	public String mailFormGet() {
 		return "study/mail/mailForm";
 	}
 	
 	// 메일전송
-	@RequestMapping(value = "mail/mailForm", method = RequestMethod.POST)
+	@RequestMapping(value = "/mail/mailForm", method = RequestMethod.POST)
 	public String mailFormPost(MailVO vo) {
 		try {
 			String toMail = vo.getToMail();
@@ -273,14 +280,14 @@ public class StudyController {
 			MimeMessage message = mailSender.createMimeMessage();
 			MimeMessageHelper messageHelper = new MimeMessageHelper(message, true, "UTF-8");
 			
-			// 메일보관함에 회원이 보내온 메세지를 모두 저장시켜둔다.
+			// 메일보관함에 회원이 보낸온 메세지를 모두 저장시켜둔다.
 			messageHelper.setTo(toMail);
 			messageHelper.setSubject(title);
 			messageHelper.setText(content);
 			
 			// 메세지 보관함의 내용을 편집해서 다시 보관함에 담아둔다.
 			content = content.replace("\n", "<br>");
-			content += "<br><hr><h3>준모가 보냅니다.</h3><hr><br>";
+			content += "<br><hr><h3>길동이가 보냅니다.</h3><hr><br>";
 			content += "<p><img src=\"cid:main.jpg\" width='500px'></p><hr>";
 			content += "<p>방문하기 : <a href='http://49.142.157.251:9090/cjgreen'>javagreenJ사이트</a></p>";
 			content += "<hr>";
@@ -298,4 +305,37 @@ public class StudyController {
 		
 		return "redirect:/msg/mailSendOk";
 	}
+	
+	// UUID 입력폼
+	@RequestMapping(value = "/uuid/uuidForm", method = RequestMethod.GET)
+	public String uuidFormGet() {
+		return "study/uuid/uuidFrom";
+	}
+	
+	// UUID 처리하기
+	@ResponseBody
+	@RequestMapping(value = "/uuid/uuidProcess", method = RequestMethod.POST)
+	public String uuidProcessPost() {
+		UUID uid = UUID.randomUUID();
+		return uid.toString();
+	}
+	
+	// 파일 업로드폼
+	@RequestMapping(value = "/fileUpload/fileUpload", method = RequestMethod.GET)
+	public String fileUploadGet() {
+		return "study/fileUpload/fileUpload";
+	}
+	
+	// 파일 업로드 처리하기
+	@RequestMapping(value = "/fileUpload/fileUpload", method = RequestMethod.POST)
+	public String fileUploadPost(MultipartFile fName) {
+		int res = studyService.fileUpload(fName);
+		if(res == 1) {
+			return "redirect:/msg/fileUploadOk";
+		}
+		else {
+			return "redirect:/msg/fileUploadNo";
+		}
+	}
+	
 }

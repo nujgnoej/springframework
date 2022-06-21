@@ -48,6 +48,10 @@ public class MessageController {
 			model.addAttribute("msg", "닉네임이 중복되었습니다. 체크하세요.");
 			model.addAttribute("url", "member/memJoin");
 		}
+		else if(msgFlag.equals("memNickCheckNo2")) {
+			model.addAttribute("msg", "닉네임이 중복되었습니다. 체크하세요.");
+			model.addAttribute("url", "member/memPwdCheck");
+		}
 		else if(msgFlag.equals("memInputOk")) {
 			model.addAttribute("msg", "회원 가입되었습니다.");
 			model.addAttribute("url", "member/memLogin");
@@ -76,17 +80,41 @@ public class MessageController {
 			model.addAttribute("msg", mid+"님 로그아웃 되셨습니다.");
 			model.addAttribute("url", "member/memLogin");
 		}
-		else if(msgFlag.equals("lelvelMemberNo")) {
+		else if(msgFlag.equals("levelMemberNo")) {
 			model.addAttribute("msg", "로그인후 사용하세요.");
 			model.addAttribute("url", "member/memLogin");
 		}
-		else if(msgFlag.equals("lelvelMemberNo")) {
+		else if(msgFlag.equals("levelMemberNo")) {
 			model.addAttribute("msg", "로그인후 사용하세요.");
 			model.addAttribute("url", "member/memLogin");
 		}
-		else if(msgFlag.equals("lelvelConfirmNo")) {
+		else if(msgFlag.equals("levelConfirmNo")) {
 			model.addAttribute("msg", "현재 등급으로는 사용하실수 없습니다.");
 			model.addAttribute("url", "member/memMain");
+		}
+		else if(msgFlag.equals("memPwdCheckNo")) {
+			model.addAttribute("msg", "비밀번호를 확인하세요.");
+			model.addAttribute("url", "member/memPwdCheck");
+		}
+		else if(msgFlag.equals("memUpdateOk")) {
+			model.addAttribute("msg", "회원정보가 수정되었습니다.");
+			model.addAttribute("url", "member/memPwdCheck");
+		}
+		else if(msgFlag.equals("memUpdateNo")) {
+			model.addAttribute("msg", "회원정보 수정 실패~~");
+			model.addAttribute("url", "member/memPwdCheck");
+		}
+		else if(msgFlag.equals("memDeleteOk")) {
+			model.addAttribute("msg", mid + "회원님! 탕퇴 되셨습니다.\\n같은 아이디로 1개월동안 다시 가입하실 수 없습니다.");
+			model.addAttribute("url", "");
+		}
+		else if(msgFlag.equals("memIdPwdSearchOk")) {
+			model.addAttribute("msg", "신규비밀번호가 이메일로 전송되었습니다.");
+			model.addAttribute("url", "member/memLogin");
+		}
+		else if(msgFlag.equals("memIdPwdSearchNo")) {
+			model.addAttribute("msg", "입력하신 정보를 확인해 주세요.");
+			model.addAttribute("url", "member/memLogin");
 		}
 		
 		return "include/message";

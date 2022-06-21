@@ -13,7 +13,7 @@ public class MemberInterceptor extends HandlerInterceptorAdapter {
   	HttpSession session = request.getSession();
   	int level = session.getAttribute("sLevel")==null ? 99 : (int) session.getAttribute("sLevel");
   	if(level > 4) { 	// 비회원들...
-  		RequestDispatcher dispatcher = request.getRequestDispatcher("/msg/lelvelMemberNo");
+  		RequestDispatcher dispatcher = request.getRequestDispatcher("/msg/levelMemberNo");
   		dispatcher.forward(request, response);
   		return false;
   	}
