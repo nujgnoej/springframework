@@ -87,11 +87,6 @@ public class MemberServiceImpl implements MemberService {
 	}
 
 	@Override
-	public ArrayList<MemberVO> getMemList() {
-		return memberDAO.getMemList();
-	}
-
-	@Override
 	public int setMemUpdateOk(MultipartFile fName, MemberVO vo) {
 		int res = 0;
 		try {
@@ -136,4 +131,15 @@ public class MemberServiceImpl implements MemberService {
 	public MemberVO getMemIdEmailCheck(String mid, String toMail) {
 		return memberDAO.getMemIdEmailCheck(mid, toMail);
 	}
+
+	@Override
+	public int totRecCnt() {
+		return memberDAO.totRecCnt();
+	}
+
+	@Override
+	public ArrayList<MemberVO> getMemList(int startIndexNo, int pageSize) {
+		return memberDAO.getMemList(startIndexNo, pageSize);
+	}
+
 }

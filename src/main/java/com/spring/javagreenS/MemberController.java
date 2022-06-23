@@ -23,6 +23,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.spring.javagreenS.pagination.PageProcess;
+import com.spring.javagreenS.pagination.PageVO;
 import com.spring.javagreenS.service.MemberService;
 import com.spring.javagreenS.vo.MemberVO;
 
@@ -38,6 +40,9 @@ public class MemberController {
 	
 	@Autowired
 	JavaMailSender mailSender;
+	
+	@Autowired
+	PageProcess pageProcess;
 	
 	// 회원 로그인
 	@RequestMapping(value = "/memLogin", method = RequestMethod.GET)
@@ -186,17 +191,28 @@ public class MemberController {
 	
 	// 회원 정보 전체 보기(정회원 이상만 볼 수 있다.)
 	@RequestMapping(value = "/memList", method = RequestMethod.GET)
-	private String memListGet(Model model) {
-		ArrayList<MemberVO> vos = memberService.getMemList(); 
+	public String memberListGet(Model model,
+			@RequestParam(name="pag", defaultValue = "1", required = false) int pag,
+			@RequestParam(name="pageSize", defaultValue = "3", required = false) int pageSize) {
 		
+		PageVO pageVO = pageProcess.totRecCnt(pag, pageSize, "member", "", "");
+		ArrayList<MemberVO> vos = memberService.getMemList(pageVO.getStartIndexNo(), pageSize);
 		model.addAttribute("vos", vos);
+		model.addAttribute("pageVO", pageVO);
 		
 		return "member/memList";
 	}
+//	public String memListGet(Model model) {
+//		ArrayList<MemberVO> vos = memberService.getMemList(); 
+//		
+//		model.addAttribute("vos", vos);
+//		
+//		return "member/memList";
+//	}
 	
 	// 회원 정보 상세 보기
 	@RequestMapping(value = "/memInfor", method = RequestMethod.GET)
-	private String memInforGet(Model model, String mid) {
+	public String memInforGet(Model model, String mid) {
 		MemberVO vo = memberService.getMemIdCheck(mid); 
 		
 		model.addAttribute("vo", vo);
@@ -206,13 +222,13 @@ public class MemberController {
 	
 	// 회원 정보 변경처리를 위한 비밀번호 확인....
 	@RequestMapping(value = "/memPwdCheck", method = RequestMethod.GET)
-	private String memPwdCheckGet() {
+	public String memPwdCheckGet() {
 		return "member/memPwdCheck";
 	}
 	
 	// 회원 정보 변경처리를 위한 비밀번호 확인처리하기
 	@RequestMapping(value = "/memPwdCheck", method = RequestMethod.POST)
-	private String memPwdCheckPost(String pwd, HttpSession session, Model model) {
+	public String memPwdCheckPost(String pwd, HttpSession session, Model model) {
 		String mid = (String) session.getAttribute("sMid");
 		MemberVO vo = memberService.getMemIdCheck(mid); 
 		if(vo != null && passwordEncoder.matches(pwd, vo.getPwd())) {

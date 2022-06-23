@@ -10,11 +10,15 @@
 	</select>
 	
 	<select id="getMemList" resultType="com.spring.javagreenS.vo.MemberVO">
-		select * from member2 order by idx desc;
+		select * from member2 order by idx desc limit #{startIndexNo}, #{pageSize};
 	</select>
 	
 	<select id="getMemIdEmailCheck" resultType="com.spring.javagreenS.vo.MemberVO">
-		select * from member2 where mid = #{mid} and email = #{toMail} ;
+		select * from member2 where mid = #{mid} and email = #{toMail};
+	</select>
+	
+	<select id="totRecCnt" resultType="int">
+		select count(*) from member2;
 	</select>
 	
 	

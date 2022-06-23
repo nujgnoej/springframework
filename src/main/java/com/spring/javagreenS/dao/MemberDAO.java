@@ -16,7 +16,7 @@ public interface MemberDAO {
 
 	public void setMemberVisitProcess(@Param("mid") String mid, @Param("todayCnt") int todayCnt, @Param("newPoint") int newPoint);
 
-	public ArrayList<MemberVO> getMemList();
+	public ArrayList<MemberVO> getMemList(@Param("startIndexNo") int startIndexNo,@Param("pageSize") int pageSize);
 
 	public void setMemUpdateOk(@Param("vo") MemberVO vo);
 
@@ -25,5 +25,7 @@ public interface MemberDAO {
 	public void setPwdChange(@Param("mid") String mid, @Param("pwd") String pwd);
 
 	public MemberVO getMemIdEmailCheck(@Param("mid") String mid, @Param("toMail") String toMail);
+
+	public int totRecCnt();
 
 }

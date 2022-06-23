@@ -116,6 +116,10 @@ public class MessageController {
 			model.addAttribute("msg", "입력하신 정보를 확인해 주세요.");
 			model.addAttribute("url", "member/memLogin");
 		}
+		else if(msgFlag.equals("boardInputOk")) {
+			model.addAttribute("msg", "게시글이 등록되었습니다.");
+			model.addAttribute("url", "board/boList");
+		}
 		
 		return "include/message";
 	}

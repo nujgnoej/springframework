@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.spring.javagreenS.dao.BoardDAO">
+	<select id="totRecCnt" resultType="int">
+		select count(*) from board2;
+	</select>
+	
+	<select id="totSearchRecCnt" resultType="int">
+		select count(*) from board2 where ${search} like concat('%',#{searchString},'%');
+	</select>
+	
+	<select id="getBoardList" resultType="com.spring.javagreenS.vo.BoardVO">
+		select *, cast(TIMESTAMPDIFF(MINUTE, wDate, NOW()) / 60 as signed integer) as diffTime from board2 order by idx desc limit #{startIndexNo}, #{pageSize};
+	</select>
+	
+	<select id="getBoardSearch" resultType="com.spring.javagreenS.vo.BoardVO">
+		select *, cast(TIMESTAMPDIFF(MINUTE, wDate, NOW()) / 60 as signed integer) AS diffTime  from board2 where ${search} like concat('%',#{searchString},'%') order by idx desc limit #{startIndexNo},#{pageSize};
+	</select>
+	
+	<select id="getBoardContent" resultType="com.spring.javagreenS.vo.BoardVO">
+		select * from board2 where idx = #{idx};
+	</select>
+	
+	<!-- <![CDATA[idx > 5]]> -->
+	<select id="getPreNext" resultType="com.spring.javagreenS.vo.BoardVO">
+		select idx,title from board2 where idx in (
+			(select idx from board2 where <![CDATA[idx < #{idx}]]> order by idx desc limit 1),
+			(select idx from board2 where <![CDATA[idx > #{idx}]]> limit 1));
+	</select>
+	
+	<select id="getMinIdx" resultType="int">
+		select min(idx) from board2;
+	</select>
+	
+	
+	<insert id="setBoardInput">
+		insert into board2 values (default,#{vo.nickName},#{vo.title},#{vo.email},#{vo.homePage},#{vo.content},default,default,#{vo.hostIp},default,#{vo.mid});
+	</insert>
+	
+	
+	<update id="setReadNum">
+		update board2 set readNum = readNum + 1 where idx = #{idx};
+	</update>
+	
+</mapper>

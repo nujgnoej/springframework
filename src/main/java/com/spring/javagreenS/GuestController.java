@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.spring.javagreenS.pagination.PageProcess;
+import com.spring.javagreenS.pagination.PageVO;
 import com.spring.javagreenS.service.GuestService;
 import com.spring.javagreenS.vo.GuestVO;
 
@@ -20,29 +22,18 @@ public class GuestController {
 	@Autowired
 	GuestService guestService;
 	
+	@Autowired
+	PageProcess pageProcess;
+	
 	@RequestMapping(value = "/guestList", method = RequestMethod.GET)
 	public String gusetListGet(Model model,
-			@RequestParam(name="pag", defaultValue = "1", required = false) int pag) {
-	  // 페이징처리를 위한 준비...
-		int pageSize = 3;
-		int totRecCnt = guestService.totRecCnt();
-		int totPage = (totRecCnt%pageSize)==0 ? totRecCnt/pageSize : (totRecCnt/pageSize)+1;
-		int startIndexNo = (pag - 1) * pageSize;
-		int curScrStartNo = totRecCnt - startIndexNo;
-
-		int blockSize = 3;
-		int curBlock = (pag - 1) / blockSize;
-		int lastBlock = (totPage % blockSize)==0 ? (totPage / blockSize) - 1 : (totPage / blockSize);
-		ArrayList<GuestVO> vos = guestService.getGuestList(startIndexNo, pageSize);
-
+			@RequestParam(name="pag", defaultValue = "1", required = false) int pag,
+			@RequestParam(name="pageSize", defaultValue = "3", required = false) int pageSize) {
+		PageVO pageVO = pageProcess.totRecCnt(pag, pageSize, "guest", "", "");
+		ArrayList<GuestVO> vos = guestService.getGuestList(pageVO.getStartIndexNo(), pageSize);
+		
 		model.addAttribute("vos", vos);
-		model.addAttribute("curScrStartNo", curScrStartNo);
-		model.addAttribute("pag", pag);
-		model.addAttribute("pageSize", pageSize);
-		model.addAttribute("totPage", totPage);
-		model.addAttribute("blockSize", blockSize);
-		model.addAttribute("curBlock", curBlock);
-		model.addAttribute("lastBlock", lastBlock);
+		model.addAttribute("pageVO", pageVO);
 		
 		return "guest/guestList";
 	}

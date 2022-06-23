@@ -30,6 +30,7 @@
     <a href="guestInput" class="btn btn-secondary">글쓰기</a>
   </div>
   <div>
+  	<c:set var="curScrStartNo" value="${pageVO.curScrStartNo}"/>
     <c:forEach var="vo" items="${vos}" varStatus="st">
 	    <table class="table table-borderless m-0 p-0">
 	      <tr>
@@ -74,25 +75,25 @@
 <!-- 블록 페이징 처리 시작 -->
 <div class="text-center">
   <ul class="pagination justify-content-center">
-	  <c:if test="${pag > 1}">
+	  <c:if test="${pageVO.pag > 1}">
 	    <li class="page-item"><a href="guestList?pag=1" class="page-link text-secondary">◁◁</a></li>
 	  </c:if>
-	  <c:if test="${curBlock > 0}">
-	    <li class="page-item"><a href="guestList?pag=${(curBlock-1)*blockSize + 1}" class="page-link text-secondary">◀</a></li>
+	  <c:if test="${pageVO.curBlock > 0}">
+	    <li class="page-item"><a href="guestList?pag=${(pageVO.curBlock-1)*pageVO.blockSize + 1}" class="page-link text-secondary">◀</a></li>
 	  </c:if>
-	  <c:forEach var="i" begin="${(curBlock*blockSize)+1}" end="${(curBlock*blockSize)+blockSize}">
-	    <c:if test="${i <= totPage && i == pag}">
+	  <c:forEach var="i" begin="${(pageVO.curBlock*pageVO.blockSize)+1}" end="${(pageVO.curBlock*pageVO.blockSize)+pageVO.blockSize}">
+	    <c:if test="${i <= pageVO.totPage && i == pageVO.pag}">
 	      <li class="page-item active"><a href="guestList?pag=${i}" class="page-link text-light bg-secondary border-secondary">${i}</a></li>
 	    </c:if>
-	    <c:if test="${i <= totPage && i != pag}">
+	    <c:if test="${i <= pageVO.totPage && i != pageVO.pag}">
 	      <li class="page-item"><a href='guestList?pag=${i}' class="page-link text-secondary">${i}</a></li>
 	    </c:if>
 	  </c:forEach>
-	  <c:if test="${curBlock < lastBlock}">
-	    <li class="page-item"><a href="guestList?pag=${(curBlock+1)*blockSize + 1}" class="page-link text-secondary">▶</a></li>
+	  <c:if test="${pageVO.curBlock < pageVO.lastBlock}">
+	    <li class="page-item"><a href="guestList?pag=${(pageVO.curBlock+1)*pageVO.blockSize + 1}" class="page-link text-secondary">▶</a></li>
 	  </c:if>
-	  <c:if test="${pag != totPage}">
-	    <li class="page-item"><a href="guestList?pag=${totPage}" class="page-link text-secondary">▷▷</a></li>
+	  <c:if test="${pageVO.pag != pageVO.totPage}">
+	    <li class="page-item"><a href="guestList?pag=${pageVO.totPage}" class="page-link text-secondary">▷▷</a></li>
 	  </c:if>
   </ul>
 </div>

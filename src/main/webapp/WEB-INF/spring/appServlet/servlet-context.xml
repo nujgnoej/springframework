@@ -16,7 +16,9 @@
 	<!-- <resources mapping="/resources/**" location="/resources/" /> -->
 	<resources mapping="/images/**" location="/resources/images/" />
 	<resources mapping="/js/**" location="/resources/js/" />
-	<resources mapping="/member/**" location="/resources/member/" />
+	<resources mapping="/member/**" location="/resources/data/member/" />
+	<resources mapping="/ckeditor/**" location="/resources/ckeditor/" />
+	<resources mapping="/data/ckeditor/**" location="/resources/data/ckeditor/" />
 
 	<!-- Resolves views selected for rendering by @Controllers to .jsp resources in the /WEB-INF/views directory -->
 	<beans:bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
@@ -31,7 +33,7 @@
 	
 	<!-- 파일업로드에 필요한 라이브러리를 Bean으로 등록(용량제한클래스등록) -->
 	<beans:bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
-		<beans:property name="maxUploadSize" value="10485760"/>  <!-- 업로드파일의 최대용량을 10MByte로 제한 -->
+		<beans:property name="maxUploadSize" value="20971520"/>  <!-- 업로드파일의 최대용량을 20MByte로 제한 -->
 		<beans:property name="defaultEncoding" value="utf-8"/>
 	</beans:bean>
   
