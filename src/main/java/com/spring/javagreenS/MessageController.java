@@ -12,6 +12,7 @@ public class MessageController {
 
 	@RequestMapping(value="/msg/{msgFlag}", method=RequestMethod.GET)
 	public String msgGet(@PathVariable String msgFlag, Model model,
+			@RequestParam(value="flag", defaultValue = "", required=false) String flag,
 			@RequestParam(value="name", defaultValue = "", required=false) String name,
 			@RequestParam(value="mid", defaultValue = "", required=false) String mid,
 			@RequestParam(value="idx", defaultValue = "0", required=false) int idx) {
@@ -119,6 +120,14 @@ public class MessageController {
 		else if(msgFlag.equals("boardInputOk")) {
 			model.addAttribute("msg", "게시글이 등록되었습니다.");
 			model.addAttribute("url", "board/boList");
+		}
+		else if(msgFlag.equals("boardDeleteOk")) {
+			model.addAttribute("msg", "게시글이 삭제되었습니다.");
+			model.addAttribute("url", "board/boList"+flag);
+		}
+		else if(msgFlag.equals("boUpdateOk")) {
+			model.addAttribute("msg", "게시글이 수정되었습니다.");
+			model.addAttribute("url", "board/boList"+flag);
 		}
 		
 		return "include/message";

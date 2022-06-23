@@ -7,20 +7,25 @@
 	<meta charset="UTF-8">
 	<title>boUpdate.jsp</title>
 	<jsp:include page="/WEB-INF/views/include/bs4.jsp"/>
+	<script src="${ctp}/ckeditor/ckeditor.js"></script>
 	<script>
+		'use strict';
 		function fCheck() {
-			var title = myForm.title.value;
-			var content = myForm.content.value;
+			let title = myForm.title.value;
+			let content = myForm.content.value;
 			
 			if(title.trim() == "") {
 				alert("게시글 제목을 입력하세요");
 				myForm.title.focus();
 			}
+			/* 
 			else if(content.trim() == "") {
 				alert("글내용을 입력하세요");
 				myForm.content.focus();
 			}
+			 */
 			else {
+				/* myForm.oriContent.value = document.getElementById("oriContent").innerHTML; */
 				myForm.submit();
 			}
 		}
@@ -31,7 +36,7 @@
 <jsp:include page="/WEB-INF/views/include/slide2.jsp"/>
 <p><br></p>
 <div class="container">
-	<form name="myForm" method="post" action="boUpdateOk.bo">
+	<form name="myForm" method="post" action="boUpdateOk">
 		<table class="table table-borderless">
 			<tr>
 				<td><h2>게시판 글 수정하기</h2></td>
@@ -56,13 +61,20 @@
 			</tr>
 			<tr>
 				<th>글내용</th>
-				<td><textarea rows="6" name="content" class="form-control" required>${vo.content}</textarea></td>
+				<td><textarea rows="6" name="content" id="CKEDITOR" class="form-control" required>${vo.content}</textarea></td>
+				<script>
+					CKEDITOR.replace("content",{
+						height:500,
+						filebrowserUploadUrl : "${ctp}/imageUpload",
+						uploadUrl : "${ctp}/imageUpload"
+					});
+				</script>
 			</tr>
 			<tr>
 				<td colspan="2" class="text-center">
 					<input type="button" value="글수정하기" onclick="fCheck()" class="btn btn-secondary"/> &nbsp;
 					<input type="reset" value="다시입력" class="btn btn-secondary"/> &nbsp;
-					<input type="button" value="돌아가기" onclick="location.href='${ctp}/boList.bo?pag=${pag}&pageSize=${pageSize}';" class="btn btn-secondary"/>
+					<input type="button" value="돌아가기" onclick="location.href='${ctp}/board/boList?pag=${pag}&pageSize=${pageSize}';" class="btn btn-secondary"/>
 				</td>
 			</tr>
 		</table>
@@ -70,6 +82,8 @@
 		<input type="hidden" name="idx" value="${vo.idx}"/>
 		<input type="hidden" name="pag" value="${pag}"/>
 		<input type="hidden" name="pageSize" value="${pageSize}"/>
+		<%-- <input type="hidden" name="oriContent"/>
+		<div id="oriContent" style="display:none;">${vo.content}</div> --%>
 	</form>
 </div>
 <br/>

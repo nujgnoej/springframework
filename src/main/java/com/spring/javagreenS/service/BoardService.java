@@ -23,4 +23,12 @@ public interface BoardService {
 
 	public int getMinIdx();
 
+	public void imgDelete(String content);
+
+	public void setBoardDelete(int idx);
+
+	public void imgCheckUpdate(String content);
+
+	public void setBoardUpdate(BoardVO vo);
+
 }

@@ -18,11 +18,8 @@ public @Data class BoardVO {
 	// 날짜형식필드를 '문자'와 '숫자'로 저장시켜주기 위한 변수를 선언
 	private int diffTime;
 	
-	// '이전글','다음글'을 위한 변수설정
-	private int preIdx;
-	private int nextIdx;
-	private String preTitle;
-	private String nextTitle;
+	// 기존 content의 내용을 담기위한 필드
+	private String oriContent;
 	
 	// 댓글의 개수를 저장하기 위한 필드
 	private int replyCount;

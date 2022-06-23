@@ -42,4 +42,13 @@
 		update board2 set readNum = readNum + 1 where idx = #{idx};
 	</update>
 	
+	<update id="setBoardUpdate">
+		update board2 set title=#{vo.title},email=#{vo.email},homePage=#{vo.homePage},content=#{vo.content},hostIp=#{vo.hostIp} where idx=#{vo.idx};
+	</update>
+	
+	
+	<delete id="setBoardDelete">
+		delete from board2 where idx = #{idx};
+	</delete>
+	
 </mapper>

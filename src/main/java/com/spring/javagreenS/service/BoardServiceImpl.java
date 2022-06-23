@@ -28,10 +28,11 @@ public class BoardServiceImpl implements BoardService {
 	public List<BoardVO> getBoardList(int startIndexNo, int pageSize) {
 		return boardDAO.getBoardList(startIndexNo, pageSize);
 	}
-
+	
+	// 게시판의 글을 올릴때 그림파일도 함께 저장할경우 처리하는 메소드...
 	@Override
 	public void imgCheck(String content) {
-		//      1         2         3         4         5         6
+		//      0         1         2         3         4         5         6
 		//      012345678901234567890123456789012345678901234567890123456789012345678901234567890
 		// <img src="/javagreenS/data/ckeditor/220622152246_map.jpg" style="height:838px; width:1489px" /></p>
 		
@@ -57,7 +58,7 @@ public class BoardServiceImpl implements BoardService {
 				sw = false;
 			}
 			else {
-				nextImg = nextImg.substring(nextImg.indexOf("src=\"/") + position);
+				nextImg =nextImg.substring(nextImg.indexOf("src=\"/") + position);
 			}
 		}
 	}
@@ -115,4 +116,87 @@ public class BoardServiceImpl implements BoardService {
 	public int getMinIdx() {
 		return boardDAO.getMinIdx();
 	}
+
+	// 게시판(board)의 ckeditor에서 올린 이미지파일을 삭제처리한다.
+	@Override
+	public void imgDelete(String content) {
+		//      0         1         2         3         4         5         6
+		//      012345678901234567890123456789012345678901234567890123456789012345678901234567890
+		// <img src="/javagreenS/data/ckeditor/board/220622152246_map.jpg" style="height:838px; width:1489px" /></p>
+		
+		if(content.indexOf("src=\"/") == -1) return;
+		
+		HttpServletRequest request = ((ServletRequestAttributes)RequestContextHolder.currentRequestAttributes()).getRequest();
+		String uploadPath = request.getSession().getServletContext().getRealPath("/resources/data/ckeditor/board/");
+		
+		int position = 37;
+		String nextImg = content.substring(content.indexOf("src=\"/") + position);
+		boolean sw = true;
+		
+		while(sw) {
+			String imgFile = nextImg.substring(0, nextImg.indexOf("\""));
+			String oriFilePath = uploadPath + imgFile;
+			
+			fileDelete(oriFilePath);	// board폴더에 존재하는 파일을 삭제처리한다.
+			
+			if(nextImg.indexOf("src=\"/") == -1) {
+				sw = false;
+			}
+			else {
+				nextImg = nextImg.substring(nextImg.indexOf("src=\"/") + position);
+			}
+		}
+	}
+
+	// 원본이미지를 삭제처리한다.(resources/data/ckeditor/board 폴더에서 삭제처리)
+	private void fileDelete(String oriFilePath) {
+		File delFile = new File(oriFilePath);
+		if(delFile.exists()) delFile.delete();
+	}
+
+	@Override
+	public void setBoardDelete(int idx) {
+		boardDAO.setBoardDelete(idx);
+	}
+
+	@Override
+	public void imgCheckUpdate(String content) {
+		//      0         1         2         3         4         5         6
+		//      012345678901234567890123456789012345678901234567890123456789012345678901234567890
+		// <img src="/javagreenS/data/ckeditor/220622152246_map.jpg" style="height:838px; width:1489px" /></p>
+		// <img src="/javagreenS/data/ckeditor/board/220622152246_map.jpg" style="height:838px; width:1489px" /></p>
+		
+		if(content.indexOf("src=\"/") == -1) return;
+		
+		HttpServletRequest request = ((ServletRequestAttributes)RequestContextHolder.currentRequestAttributes()).getRequest();
+		String uploadPath = request.getSession().getServletContext().getRealPath("/resources/data/ckeditor/board/");
+		
+		int position = 37;
+		String nextImg = content.substring(content.indexOf("src=\"/") + position);
+		boolean sw = true;
+		
+		while(sw) {
+			String imgFile = nextImg.substring(0, nextImg.indexOf("\""));
+			String oriFilePath = uploadPath + imgFile;
+			String copyFilePath = request.getRealPath("/resources/data/ckeditor/" + imgFile);
+			
+			fileCopyCheck(oriFilePath, copyFilePath);	// board폴더에 파일을 복사처리한다.
+			
+			if(nextImg.indexOf("src=\"/") == -1) {
+				sw = false;
+			}
+			else {
+				nextImg =nextImg.substring(nextImg.indexOf("src=\"/") + position);
+			}
+		}		
+		
+	}
+
+	@Override
+	public void setBoardUpdate(BoardVO vo) {
+		boardDAO.setBoardUpdate(vo);
+	}
 }
+
+
+
